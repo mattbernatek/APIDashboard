@@ -32,10 +32,7 @@ jokeBtn.addEventListener("click", getJoke);
 adviceBtn.addEventListener("click", getAdvice);
 
 async function getRandomQuote() {
-    const quoteResponse = await fetch("https://api.api-ninjas.com/v2/randomquotes", {
-        headers: { 'X-Api-Key': 'ox9IedvKG5Ow8ri4OBbjhkI82t1aDlFlO9kI7MCv' }
-
-    });
+    const quoteResponse = await fetch("https://api.quotable.io/quotes/random");
     const quoteData = await quoteResponse.json();
     
 
