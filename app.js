@@ -59,8 +59,44 @@ function getWeather() {
   
 }
 
-function getExchange() {
+async function getExchange() {
+    let amount = amountInput.value.trim();
+    amount = amount === "" ? 0 : Number(amount);
 
+    const sourceCurrency = sourceCurrencyInput.value.trim().toUpperCase()
+    const targetCurrency = targetCurrencyInput.value.trim().toUpperCase();
+
+    if (amount < 0 || isNaN(amount)) {
+        currencyOutput.textContent = "Please enter a valid amount.";
+        return;
+    }
+
+    if (sourceCurrency.length !== 3 || targetCurrency.length !== 3) {
+        currencyOutput.textContent = "Currency codes must be 3 letters.";
+        return;
+    }
+
+    const exchangeResponse = await fetch(`https://api.exchangerate-api.com/v4/latest/${sourceCurrency}`);
+    const exchangeData = await exchangeResponse.json();
+
+    if (!exchangeData.rates) {
+        currencyOutput.textContent = "Problem getting exchange rates. Try again later";
+        return;
+    }
+
+    if (!(targetCurrency in exchangeData.rates)) {
+        currencyOutput.textContent = "Invalid target currency";
+        return;
+    }
+
+    const rate = exchangeData.rates[targetCurrency];
+    const convertedAmount = (amount * rate).toFixed(2);
+
+    currencyOutput.innerHTML = "";
+
+    const p = document.createElement("p");
+    p.textContent = `${amount} ${sourceCurrency} = ${convertedAmount} ${targetCurrency}`;
+    currencyOutput.appendChild(p);
 }
 
 function getMovies() {
