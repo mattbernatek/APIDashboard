@@ -1,4 +1,4 @@
-const quoteBtn = document.querySelector("#quote-btn");
+const factBtn = document.querySelector("#fact-btn");
 const catBtn = document.querySelector("#cat-btn");
 const weatherBtn = document.querySelector("#weather-btn");
 const currencyBtn = document.querySelector("#currency-btn");
@@ -7,7 +7,7 @@ const githubBtn = document.querySelector("#github-btn");
 const jokeBtn = document.querySelector("#joke-btn");
 const adviceBtn = document.querySelector("#advice-btn");
 
-const quoteOutput = document.querySelector("#quote-output");
+const factOutput = document.querySelector("#fact-output");
 const catOutput = document.querySelector("#cat-output");
 const weatherOutput = document.querySelector("#weather-output");
 const currencyOutput = document.querySelector("#currency-output");
@@ -22,7 +22,7 @@ const sourceCurrencyInput = document.querySelector("#source-currency-input");
 const targetCurrencyInput = document.querySelector("#target-currency-input");
 const githubUserInput = document.querySelector("#github-user-input");
 
-quoteBtn.addEventListener("click", getRandomQuote);
+factBtn.addEventListener("click", getRandomFact);
 catBtn.addEventListener("click", getCatImage);
 weatherBtn.addEventListener("click", getWeather);
 currencyBtn.addEventListener("click", getExchange);
@@ -31,17 +31,15 @@ githubBtn.addEventListener("click", getGitHubUser);
 jokeBtn.addEventListener("click", getJoke);
 adviceBtn.addEventListener("click", getAdvice);
 
-async function getRandomQuote() {
-    const quoteResponse = await fetch("https://api.quotable.io/quotes/random");
-    const quoteData = await quoteResponse.json();
-    
+async function getRandomFact() {
+    const factResponse = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random?language=en");
+    const factData = await factResponse.json();
 
-    quoteOutput.textContent = `${quoteData[0].quote} - ${quoteData[0].author}`;
-    quoteOutput.innerHTML = "";
+    factOutput.innerHTML = "";
 
     const p = document.createElement("p");
-    p.textContent = `${quoteData[0].quote} - ${quoteData[0].author}`;
-    quoteOutput.appendChild(p);
+    p.textContent = factData.text;
+    factOutput.appendChild(p);
 }
 
 async function getCatImage() {
@@ -69,14 +67,29 @@ function getMovies() {
 
 }
 
-function getGitHubUser() {
-  
+async function getGitHubUser() {
+    const githubUser = githubUserInput.value.trim();
+    if (!githubUser) {
+        githubOutput.textContent = "Please enter a GitHub username.";
+        return;
+    }
+    const githubResponse = await fetch(`https://api.github.com/users/${githubUser}`);
+    if (githubResponse.status === 404) {
+        githubOutput.textContent = "User not found.";
+        return;
+    }
+    const githubData = await githubResponse.json();
+
+    githubOutput.innerHTML = "";
+
+    const p = document.createElement("p");
+    p.textContent = `Username: ${githubData.login}, Public Repos: ${githubData.public_repos}, Followers: ${githubData.followers}`;
+    githubOutput.appendChild(p);
 }
 
 async function getJoke() {
     const jokeResponse = await fetch("https://official-joke-api.appspot.com/jokes/random");
     const jokeData = await jokeResponse.json();
-    jokeOutput.textContent = `${jokeData.setup} ${jokeData.punchline}`;
 
     jokeOutput.innerHTML = "";
 
@@ -88,7 +101,6 @@ async function getJoke() {
 async function getAdvice() {
     const adviceResponse = await fetch("https://api.adviceslip.com/advice");
     const adviceData = await adviceResponse.json();
-    adviceOutput.textContent = `${adviceData.slip.advice}`;
     adviceOutput.innerHTML = "";
     
     const p = document.createElement("p");
