@@ -55,8 +55,33 @@ async function getCatImage() {
     catOutput.appendChild(img);
 }
 
-function getWeather() {
-  
+async function getWeather() {
+    const city = cityInput.value.trim();
+    
+    if (!city) {
+        weatherOutput.textContent = "Please enter a city name.";
+        return;
+    }
+
+    const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
+    const geoData = await geoResponse.json();
+
+    if (!geoData.results || geoData.results.length === 0) {
+        weatherOutput.textContent = "City not found.";
+        return;
+    }
+
+    const latitude = geoData.results[0].latitude;
+    const longitude = geoData.results[0].longitude;
+    
+    const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+
+    if (!weatherResponse.current_weather || weatherResponse.current_weather.length === 0) {
+        weatherOutput.textContent = "Problem getting weather data. Try again later.";
+        return;
+    }
+
+    const weatherData = await weatherResponse.json();
 }
 
 async function getExchange() {
