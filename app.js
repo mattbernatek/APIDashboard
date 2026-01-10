@@ -22,6 +22,8 @@ const sourceCurrencyInput = document.querySelector("#source-currency-input");
 const targetCurrencyInput = document.querySelector("#target-currency-input");
 const githubUserInput = document.querySelector("#github-user-input");
 
+const tmbd_token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZTFlMTYyODBkZGFmNDViMjU4OWQ2NmViYWUyNDBhYSIsIm5iZiI6MTc2ODA4MDA3NS40NjgsInN1YiI6IjY5NjJjMmNiMWY3ODQzN2UwNjFkOGFlMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BKLhkrLkx8e1aubloK3adE230BomdHU_Ulzgocpv0qM";
+
 factBtn.addEventListener("click", getRandomFact);
 catBtn.addEventListener("click", getCatImage);
 weatherBtn.addEventListener("click", getWeather);
@@ -30,6 +32,7 @@ moviesBtn.addEventListener("click", getMovies);
 githubBtn.addEventListener("click", getGitHubUser);
 jokeBtn.addEventListener("click", getJoke);
 adviceBtn.addEventListener("click", getAdvice);
+
 
 async function getRandomFact() {
     const factResponse = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random?language=en");
@@ -135,8 +138,34 @@ async function getExchange() {
     currencyOutput.appendChild(p);
 }
 
-function getMovies() {
+async function getMovies() {
+    const moviesResponse = await fetch("https://api.themoviedb.org/3/trending/movie/week", {headers: { 
+        Authorization: `Bearer ${tmbd_token}`, 
+    }, 
+    });
 
+    if (!moviesResponse.ok) {
+        moviesOutput.textContent = "Problem getting movies data. Try again later.";
+        return;
+    }
+
+    const moviesData = await moviesResponse.json();
+
+    if (!moviesData.results || moviesData.results.length === 0) {
+        moviesOutput.textContent = "Problem getting movies data. Try again later.";
+        return;
+    }
+
+    moviesOutput.innerHTML = "";
+
+    const ul = document.createElement("ul");
+    moviesOutput.appendChild(ul);
+
+    moviesData.results.slice(0, 5).forEach(movie => {
+        const li = document.createElement("li");
+        li.textContent = `${movie.title} (Rating: ${movie.vote_average})`;
+        ul.appendChild(li);
+    });
 }
 
 async function getGitHubUser() {
