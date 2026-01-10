@@ -76,12 +76,23 @@ async function getWeather() {
     
     const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
 
-    if (!weatherResponse.current_weather || weatherResponse.current_weather.length === 0) {
+    if (!weatherResponse.ok) {
         weatherOutput.textContent = "Problem getting weather data. Try again later.";
         return;
     }
 
     const weatherData = await weatherResponse.json();
+
+    if (!weatherData.current_weather) {
+        weatherOutput.textContent = "Problem getting weather data. Try again later.";
+        return;
+    }
+
+    weatherOutput.innerHTML = "";
+
+    const p = document.createElement("p");
+    p.textContent = `Current temperature in ${city} is ${weatherData.current_weather.temperature}°C with wind speed of ${weatherData.current_weather.windspeed} km/h.`;
+    weatherOutput.appendChild(p);
 }
 
 async function getExchange() {
